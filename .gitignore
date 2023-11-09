@@ -1,0 +1,11 @@
+# ignore ALL .pt files and .sh files
+*.pt
+* .pth
+
+# ignore ALL files in ANY directory named temp
+logs/
+.neptune
+.idea
+_pycache_
+.png
+
