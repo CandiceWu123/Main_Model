@@ -14,7 +14,7 @@ import datetime
 import cv2
 import neptune
 
-os.environ['CUDA_VISIBLE_DEVICES']= '1, 2, 3, 4, 5'
+os.environ['CUDA_VISIBLE_DEVICES']= '0, 3, 4, 5, 6, 7'
 os.environ['TORCH_DISTRIBUTED_DEBUG'] = "DETAIL"
 local_rank = int(os.environ["LOCAL_RANK"])
 cv2.ocl.setUseOpenCL(False)
@@ -177,7 +177,7 @@ def main():
         sota_aerial = 9.61
     if args.backbone == 'resnet101':
         sota_animal = 55.51
-        sota_eyeballs = 20.2
+        sota_eyeballs = 10.2
         sota_cracks = 1.55
         sota_steel = 9.72
         sota_luna = 6.34
