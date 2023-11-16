@@ -131,9 +131,8 @@ class Logger:
         logging.info(msg)
 
     @classmethod
-    def save_model_miou(cls, model, epoch, val_miou, model_version):
-        torch.save(model.state_dict(), os.path.join(cls.logpath, str(epoch) + 'best_model.pt'))
+    def save_model_miou(cls, model, epoch, val_miou):
+        torch.save(model.state_dict(), os.path.join(cls.logpath, 'best_model.pt'))
         # run["model"].upload(os.path.join(cls.logpath, 'best_model.pt'))
         # model_version["model/binary"].upload(os.path.join(cls.logpath, 'best_model.pt'))
-        model_version["log_path"] = cls.logpath
         cls.info('Model saved @%d w/ val. mIoU: %5.2f.\n' % (epoch, val_miou))

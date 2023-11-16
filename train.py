@@ -14,7 +14,7 @@ import datetime
 import cv2
 import neptune
 
-os.environ['CUDA_VISIBLE_DEVICES']= '0, 3, 4, 5, 6, 7'
+os.environ['CUDA_VISIBLE_DEVICES']= '0,1, 2, 3, 4, 5'
 os.environ['TORCH_DISTRIBUTED_DEBUG'] = "DETAIL"
 local_rank = int(os.environ["LOCAL_RANK"])
 cv2.ocl.setUseOpenCL(False)
@@ -143,13 +143,14 @@ def main():
                     print("no grad", name)
             Logger.initialize(args, training = True)
             Logger.info('# available GPUs: %d' % torch.cuda.device_count())
-            model_version = neptune.init_model_version(project="wujr/Model", model=args.model_name, api_token=API_TOKEN)
-            model_version["model/parameters"] = args
-            run = neptune.init_run(project="wujr/Model", api_token=API_TOKEN, source_files=["**/*.py", "**/*.sh"])
-            run["parameters"] = args
-            run["sys/tags"].add("train")
-            # run["sys/tags"].add(args.benchmark)
-            model_version["run/id"] = run["sys/id"].fetch()
+            if args.neptune:
+                model_version = neptune.init_model_version(project="wujr/Model", model=args.model_name, api_token=API_TOKEN)
+                model_version["model/parameters"] = args
+                run = neptune.init_run(project="wujr/Model", api_token=API_TOKEN, source_files=["**/*.py", "**/*.sh"])
+                run["parameters"] = args
+                run["sys/tags"].add("train")
+                # run["sys/tags"].add(args.benchmark)
+                model_version["run/id"] = run["sys/id"].fetch()
     else:
         device = torch.device("cuda")
         model.to(device)
@@ -182,12 +183,19 @@ def main():
         sota_steel = 9.72
         sota_luna = 6.34
         sota_aerial = 9.48
+    if args.backbone == 'swin-l':
+        sota_animal = 61.91
+        sota_eyeballs = 9.86
+        sota_cracks = 8.97
+        sota_steel = 12.25
+        sota_luna = 7.22
+        sota_aerial = 9.46
     # sota_sum = sota_animal + sota_aerial + sota_luna + sota_steel + sota_cracks + sota_eyeballs
     for epoch in range(args.nepoch):
         if args.distributed:
             dataloader_trn.sampler.set_epoch(epoch)
         trn_loss, trn_miou, trn_fb_iou = train(epoch, model, dataloader_trn, optimizer, cross_entropy_loss, training=True)
-        if main_process(local_rank):
+        if main_process(local_rank) and args.neptune:
             run["train/loss"].append(trn_loss)
             run["train/miou"].append(trn_miou)
         # evaluation
@@ -223,7 +231,7 @@ def main():
                     best_better_than_sota_num = temp_num
                     best_sum = max(best_sum, sum)
                     if main_process(local_rank):
-                        Logger.save_model_miou(model, epoch, animal_val_miou, model_version)
+                        Logger.save_model_miou(model, epoch, animal_val_miou)
                 best_animal = max(animal_val_miou, best_animal)
                 best_eyeballs = max(eyeballs_val_miou, best_eyeballs)
                 best_aerial = max(aerial_val_miou, best_aerial)
