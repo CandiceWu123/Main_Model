@@ -16,7 +16,7 @@ def parse_opts():
     parser.add_argument('--fold', type=int, default=0, choices=[0, 1, 2, 3])
     parser.add_argument('--bsz', type=int, default=1)
     parser.add_argument('--nworker', type=int, default=0)
-    parser.add_argument('--backbone', type=str, default='swin-l', choices=['resnet50', 'resnet101', 'swin-b', 'swin-l'])
+    parser.add_argument('--backbone', type=str, default='swin-l', choices=['resnet50', 'resnet101', 'swin-b', 'swin-l', 'vgg'])
     parser.add_argument('--feature_extractor_path', type=str, default='./swin_base_patch4_window12_384_22kto1k.pth')
     parser.add_argument('--logpath', type=str, default='./logs')
     parser.add_argument('--model_name', type=str, default='')

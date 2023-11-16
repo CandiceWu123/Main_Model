@@ -7,6 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision.models import resnet
 from .base.swin_transformer import SwinTransformer
+from torchvision.models import vgg
 from .base.transformer import MultiHeadedAttention, PositionalEncoding
 
 
@@ -47,6 +48,11 @@ class DCAMA(nn.Module):
             self.feat_channels = [192, 384, 768, 1536]
             self.nlayers = [2, 2, 18, 2]
             self.m_nlayers = [2, 18, 2]
+        elif backbone == 'vgg':
+            self.feature_extractor = vgg.vgg16('IMAGENET1K_V1')
+            self.feat_channels = [256, 512, 512, 512]
+            self.nlayers = [3, 3, 3, 1]
+            self.m_nlayers = [3, 3, 1]
         else:
             raise Exception('Unavailable backbone: %s' % backbone)
         self.feature_extractor.eval()
@@ -157,6 +163,31 @@ class DCAMA(nn.Module):
                     feats.append(feat.clone())
 
                 feat = self.feature_extractor.__getattr__('layer%d' % lid)[bid].relu.forward(feat)
+        elif self.backbone == 'vgg':
+            # 1/4 feature
+            feat = self.feature_extractor.features[:12](img)
+            feats.append(feat)
+            feat = self.feature_extractor.feature[12:14](feat)
+            feats.append(feat)
+            feat = self.feature_extractor.feature[14:16](feat)
+            feats.append(feat)
+            # 1/8 feature
+            feat = self.feature_extractor.feature[16:19](feat)
+            feats.append(feat)
+            feat = self.feature_extractor.feature[19:21](feat)
+            feats.append(feat)
+            feat = self.feature_extractor.feature[21:23](feat)
+            feats.append(feat)
+            # 1/16 feature
+            feat = self.feature_extractor.feature[23:26](feat)
+            feats.append(feat)
+            feat = self.feature_extractor.feature[26:28](feat)
+            feats.append(feat)
+            feat = self.feature_extractor.feature[28:30](feat)
+            feats.append(feat)
+            # 1/32 feature
+            feat = self.feature_extractor.feature[30:31](feat)
+            feats.append(feat)
 
         return feats
 

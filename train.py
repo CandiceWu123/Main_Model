@@ -89,14 +89,12 @@ def main():
     # model initialization
     if args.backbone == 'swin-b':
         _feat_channels = [128, 256, 512, 1024]
-        _conv_dim = 256
-        _mask_dim = 256
     if args.backbone == 'swin-l':
         _feat_channels = [192, 384, 768, 1536]
-        _conv_dim = 384
-        _mask_dim = 384
     if args.backbone == 'resnet101' or args.backbone == 'resnet50':
         _feat_channels = [256, 512, 1024, 2048]
+    if args.backbone == 'vgg':
+        _feat_channels = [256, 512, 512, 512]
     """
     model = Model(backbone=args.backbone, pretrained_path=args.feature_extractor_path, use_original_imgsize=False,
                   feat_channels=_feat_channels, n_layers=[2, 18, 2], conv_dim=_conv_dim, mask_dim=_mask_dim)
