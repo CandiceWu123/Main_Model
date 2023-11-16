@@ -1,12 +1,13 @@
 # ignore ALL .pt files and .sh files
-*.pt
+* .pt
 * .pth
-*.sh
-*.pyc
+* .sh
+* .pyc
 
 # ignore ALL files in ANY directory named temp
 logs/
 __pycache__/
+best_model/
 .neptune
 .idea
 _pycache_
